@@ -79,22 +79,23 @@ app.get('/api/v2/words', async (req, res) => {
   const length = req.query.length;
   const lang = req.query.lang;
 
-  try {const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${length}&lang=${lang}`);
-  const data = await response.json();
+  try {
+    const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${length}&lang=${lang}`);
+    const data = await response.json();
 
-  const newWord = data[0];
-  if (newWord && !words.includes(newWord)) {
-    words.push(newWord);
-    await fs.writeFile('.data/words.json',
-      JSON.stringify(words)
-    ) 
+    const newWord = data[0];
+    if (newWord && !words.includes(newWord)) {
+      words.push(newWord);
+      await fs.promises.writeFile(
+        path.join(__dirname, "data", "words.json"),
+        JSON.stringify(words, null, 2),
+        "utf-8"
+      );
+    }
+    res.status(200).json({ word: newWord });
+  } catch (error) {
+    res.status(500).json({ error: "Error procesando la petición para API externa" });
   }
-  res.status(200).json({ word: data[0]});}
-  catch (error) {
-    res.status(500).json({ error: "Error procesando la petición para API externa"});
-  }
-  
-
 });
 
 
