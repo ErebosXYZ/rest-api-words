@@ -87,7 +87,7 @@ app.get('/api/v2/words', async (req, res) => {
 
 // 404 para rutas no existentes
 app.use((req, res) => {
-  res.status(404).json({ error: "Endpoint not found" });  c
+  res.status(404).json({ error: "Endpoint not found" });  
 });
 
 // Iniciar servidor
