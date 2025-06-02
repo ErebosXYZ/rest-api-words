@@ -5,6 +5,14 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const languages = [
+  "zh",
+  "pt-br",
+  "es",
+  "de",
+  "it",
+  "fr"
+];
 
 // Cargar palabras desde archivo
 // const words = require("./data/words.json");
@@ -34,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Iteración 2
 
 app.get('/api/v1/words', (req, res) => {
-    console.log("GET /api/v1/words called");
+  console.log("GET /api/v1/words called");
 
   const length = parseInt(req.query.length);
 
@@ -54,12 +62,32 @@ app.get('/api/v1/words', (req, res) => {
 
 // Iteración 3
 
+app.get('/api/v2/languages', (req, res) => {
+  res.status(200).json({
+    languages: languages
+  })
+})
+
 // Iteración 4
+
+app.get('/api/v2/words', async (req, res) => {
+  const length = req.query.length;
+  const lang = req.query.lang;
+
+  try {const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${length}&lang=${lang}`);
+  const data = await response.json();
+  res.status(200).json({ word: data[0]});}
+  catch (error) {
+    res.status(500).json({ error: "Error procesando la petición para API externa"});
+  }
+  
+
+});
 
 
 // 404 para rutas no existentes
 app.use((req, res) => {
-  res.status(404).json({ error: "Endpoint not found" });
+  res.status(404).json({ error: "Endpoint not found" });  c
 });
 
 // Iniciar servidor
