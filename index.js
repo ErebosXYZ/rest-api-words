@@ -1,7 +1,9 @@
 // app.js
+const fs = require("fs");
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +30,9 @@ try {
 // Middleware
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Deshabilitamos la seguridad CORS
+app.use(cors());
 
 // Endpoints
 
@@ -76,6 +81,14 @@ app.get('/api/v2/words', async (req, res) => {
 
   try {const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${length}&lang=${lang}`);
   const data = await response.json();
+
+  const newWord = data[0];
+  if (newWord && !words.includes(newWord)) {
+    words.push(newWord);
+    await fs.writeFile('.data/words.json',
+      JSON.stringify(words)
+    ) 
+  }
   res.status(200).json({ word: data[0]});}
   catch (error) {
     res.status(500).json({ error: "Error procesando la petición para API externa"});
